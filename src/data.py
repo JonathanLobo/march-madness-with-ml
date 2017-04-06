@@ -49,19 +49,24 @@ def update_stats(season, team, fields):
         if key not in team_stats[season][team]:
             team_stats[season][team][key] = []
 
+        # We only want to keep track of n most recent games, so get rid of the oldest if necessary
+        if len(team_stats[season][team][key]) >= 15:
+            team_stats[season][team][key].pop()
+
         team_stats[season][team][key].append(value)
 
 # use outside of this file when we want to get game features so that we can predict using any model
-def get_game_features(team_1, team_2, season, team_stats):
-    features = []
+def get_tourney_game_features(team_1, team_2, season, all_stats):
+    # both teams are "away" since it is a tourney game
+    features = [1, 1]
 
     # Team 1
     for stat in stat_fields:
-        features.append(get_stat_final(season, team_1, stat, team_stats))
+        features.append(get_stat_final(season, team_1, stat, all_stats))
 
     # Team 2
     for stat in stat_fields:
-        features.append(get_stat_final(season, team_2, stat, team_stats))
+        features.append(get_stat_final(season, team_2, stat, stats))
 
     return features
 
@@ -93,10 +98,44 @@ def build_season_data(data):
     for index, row in data.iterrows():
 
         skip = 0
+        firstLoc = 0
+        secondLoc = 0
+        randNum = random.random()
+
+        # home = 0, away and neutral = 1
+        if (randNum > 0.5):
+            if (row['Wloc'] == 'H'):
+                # first team is home, second is away
+                firstLoc = 0
+                secondLoc = 1
+            elif (row['Wloc'] == 'A'):
+                # first team is away, second is home
+                firstLoc = 1
+                secondLoc = 0
+            else:
+                # both teams are "away" (neutral)
+                firstLoc = 1
+                secondLoc = 1
+        else:
+            if (row['Wloc'] == 'H'):
+                # first team is away, second is home
+                firstLoc = 1
+                secondLoc = 0
+            elif (row['Wloc'] == 'A'):
+                # first team is home, second is away
+                firstLoc = 0
+                secondLoc = 1
+            else:
+                # both teams are "away" (neutral)
+                firstLoc = 1
+                secondLoc = 1
+
+        loc = [firstLoc, secondLoc]
 
         team_1_features = []
         team_2_features = []
 
+        # get all other team statistics
         for field in stat_fields:
             team_1_stat = get_stat_temp(row['Season'], row['Wteam'], field)
             team_2_stat = get_stat_temp(row['Season'], row['Lteam'], field)
@@ -108,12 +147,13 @@ def build_season_data(data):
                 skip = 1
 
         # if skip = 0, it is the first game of the season so we have no prior statistics (everything is 0)
+        # We label as '0' if team1 won, label as '1' if team2 won
         if skip == 0:
-            if random.random() > 0.5:
-                X.append(team_1_features + team_2_features)
+            if randNum > 0.5:
+                X.append(loc + team_1_features + team_2_features)
                 y.append(0)
             else:
-                X.append(team_2_features + team_1_features)
+                X.append(loc + team_2_features + team_1_features)
                 y.append(1)
 
         # Update teams' overall stats so that they can later be averaged and used to make predictions
