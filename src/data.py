@@ -66,7 +66,7 @@ def get_tourney_game_features(team_1, team_2, season, all_stats):
 
     # Team 2
     for stat in stat_fields:
-        features.append(get_stat_final(season, team_2, stat, stats))
+        features.append(get_stat_final(season, team_2, stat, all_stats))
 
     return features
 
