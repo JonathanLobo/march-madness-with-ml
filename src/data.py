@@ -8,6 +8,7 @@ stat_fields = ['score', 'fgm', 'fga', 'fgm3', 'fga3', 'ftm', 'fta', 'or', 'dr',
 
 tourneyYear = '2017'
 
+# return csv as a pandas dataframe
 def format_as_df(csv_file):
     df = pd.read_csv(csv_file)
     return df
@@ -22,6 +23,7 @@ def get_dataframes():
     seeds = d.format_as_df('../data' + tourneyYear + '/TourneySeeds.csv')
     slots = d.format_as_df('../data' + tourneyYear + '/TourneySlots.csv')
 
+# get temporary team stats for a current point in the season while generating test cases
 def get_stat_temp(season, team, field):
     try:
         stat = team_stats[season][team][field]
@@ -29,6 +31,7 @@ def get_stat_temp(season, team, field):
     except:
         return 0
 
+# get final team stats for a season, passing in an array of team stats, to use for prediction
 def get_stat_final(season, team, field, team_stats):
     try:
         stat = team_stats[season][team][field]
@@ -36,6 +39,7 @@ def get_stat_final(season, team, field, team_stats):
     except:
         return 0
 
+# update team stats based on most recent game
 def update_stats(season, team, fields):
     if team not in team_stats[season]:
         team_stats[season][team] = {}
@@ -61,6 +65,7 @@ def get_game_features(team_1, team_2, season, team_stats):
 
     return features
 
+# get the ids of all teams in the tourney and a map of team ids to their actual name
 def get_tourney_teams(year):
     seeds = pd.read_csv('../data' + tourneyYear + '/TourneySeeds.csv')
     tourney_teams = []
@@ -72,6 +77,7 @@ def get_tourney_teams(year):
 
     return tourney_teams, team_id_map
 
+# get a map of team ids to team names
 def get_team_dict():
     teams = pd.read_csv('../data' + tourneyYear + '//Teams.csv')
     team_map = {}
@@ -79,6 +85,7 @@ def get_team_dict():
         team_map[row['Team_Id']] = row['Team_Name']
     return team_map
 
+# build test cases for all seasons
 def build_season_data(data):
     X = []
     y = []
@@ -176,7 +183,7 @@ def build_season_data(data):
     return X, y
 
 def get_data():
-    year = 2016
+    year = int(tourneyYear)
 
     for i in range(1985, year+1):
         team_stats[i] = {}
