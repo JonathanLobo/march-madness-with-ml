@@ -38,7 +38,7 @@ if __name__ == "__main__":
     print("Done fitting the model!")
 
     # make predictions
-    testPredictions = mlp.predict(testingX)
+    testPredictions = neural_net.predict(testingX)
 
     print("Finished Neural Network predictions!")
 
