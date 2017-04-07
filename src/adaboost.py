@@ -56,7 +56,7 @@ def adaBoost(M, D, T, N, trainingX, thresholds):
 		# update weights using alpha
 		for n in range(0, N):	# N samples
 			I = 0
-			if (bestStump[n] != dataLabels[n]):
+			if (bestStump[n] != trainingY[n]):
 				I = 1
 			weights[n] = weights[n] * math.exp(alpha * I)
 
@@ -125,9 +125,9 @@ if __name__ == '__main__':
 
 	matchups = []
 
-	for team1 in tourney_teams:
-	    for team2 in tourney_teams:
-	        if team1 < team2:
+	for team_1 in tourney_teams:
+	    for team_2 in tourney_teams:
+	        if team_1 < team_2:
 	            game_features = data.get_game_features(team_1, team_2, 0, 2017, team_stats)
 	            testingXtemp.append(game_features)
 
