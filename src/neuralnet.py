@@ -1,7 +1,7 @@
 import data
 import numpy as np
-
 from sklearn.neural_network import MLPClassifier
+from sklearn.metrics import accuracy_score
 
 def train():
     print "Building Data..."
@@ -25,9 +25,6 @@ def train():
 
     testingX = np.array(testingXtemp)
 
-    # here is where you train the model using trainingX and trainingY
-    # then make output label predictions based on testingX
-
     print "Fitting model..."
     model = MLPClassifier(solver='lbfgs', alpha=1e-5, hidden_layer_sizes=(5, 2), random_state=1)
     model.fit(trainingX, trainingY)
@@ -49,3 +46,4 @@ def predict(model, test_data, matchups):
 if __name__ == "__main__":
     model, test_data, matchups = train()
     predict(model, test_data, matchups)
+
