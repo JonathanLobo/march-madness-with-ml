@@ -1,6 +1,5 @@
 import data
 import numpy as np
-
 from sklearn import linear_model
 
 def train():
@@ -25,12 +24,9 @@ def train():
 
     testingX = np.array(testingXtemp)
 
-    # here is where you train the model using trainingX and trainingY
-    # then make output label predictions based on testingX
-
     print "Fitting model..."
     model = linear_model.LogisticRegression(C=1e5)
-    model.fit(trainingX, trainingY)
+    model.fit(trainingX, np.ravel(trainingY))
 
     return model, testingX, matchups
 
@@ -44,7 +40,7 @@ def predict(model, test_data, matchups):
         matchups[i].append(predictions[i])
 
     results = np.array(matchups)
-    np.savetxt("regression_predictions_2017.csv", results, delimiter=",", fmt='%s')
+    np.savetxt("Regression_Predictions_2017.csv", results, delimiter=",", fmt='%s')
 
 if __name__ == "__main__":
     model, test_data, matchups = train()

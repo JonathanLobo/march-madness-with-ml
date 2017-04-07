@@ -26,8 +26,8 @@ def train():
     testingX = np.array(testingXtemp)
 
     print "Fitting model..."
-    model = MLPClassifier(solver='lbfgs', alpha=1e-5, hidden_layer_sizes=(5, 2), random_state=1)
-    model.fit(trainingX, trainingY)
+    model = MLPClassifier(hidden_layer_sizes=(30, 30))
+    model.fit(trainingX, np.ravel(trainingY))
 
     return model, testingX, matchups
 
@@ -41,9 +41,8 @@ def predict(model, test_data, matchups):
         matchups[i].append(predictions[i])
 
     results = np.array(matchups)
-    np.savetxt("neuralnet_predictions_2017.csv", results, delimiter=",", fmt='%s')
+    np.savetxt("NeuralNet_Predictions_2017.csv", results, delimiter=",", fmt='%s')
 
 if __name__ == "__main__":
     model, test_data, matchups = train()
     predict(model, test_data, matchups)
-
