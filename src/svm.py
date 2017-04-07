@@ -58,7 +58,7 @@ if __name__ == "__main__":
         matchups[i].append(predict_rbf[i])
 
     results = np.array(matchups)
-    np.savetxt("Predictions2017.csv", results, delimiter=",", fmt='%s')
+    np.savetxt("SVM_Predictions_2017.csv", results, delimiter=",", fmt='%s')
 
     # print(str(accuracy_score(testingY, predict_rbf)))
     # print(str(accuracy_score(testingY, predict_linear)))
