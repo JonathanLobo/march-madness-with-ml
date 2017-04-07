@@ -1,5 +1,6 @@
 import pandas as pd
 import random
+import numpy as np
 
 team_stats = {}
 stat_fields = ['score', 'fgm', 'fga', 'fgm3', 'fga3', 'ftm', 'fta', 'or', 'dr',
@@ -56,9 +57,17 @@ def update_stats(season, team, fields):
         team_stats[season][team][key].append(value)
 
 # use outside of this file when we want to get game features so that we can predict using any model
-def get_tourney_game_features(team_1, team_2, season, all_stats):
+def get_game_features(team_1, team_2, loc, season, all_stats):
     # both teams are "away" since it is a tourney game
-    features = [1, 1]
+    if (loc == 1):
+        # first team is home, second is away
+        features = [0, 1]
+    elif (loc == -1):
+        # first team is away, second is home
+        features = [1, 0]
+    else:
+        # both teams are "away" (neutral)
+        features = [1, 1]
 
     # Team 1
     for stat in stat_fields:
@@ -84,7 +93,7 @@ def get_tourney_teams(year):
 
 # get a map of team ids to team names
 def get_team_dict():
-    teams = pd.read_csv('../data' + tourneyYear + '//Teams.csv')
+    teams = pd.read_csv('../data' + tourneyYear + '/Teams.csv')
     team_map = {}
     for index, row in teams.iterrows():
         team_map[row['Team_Id']] = row['Team_Name']
@@ -220,7 +229,10 @@ def build_season_data(data):
         update_stats(row['Season'], row['Wteam'], stat_1_fields)
         update_stats(row['Season'], row['Lteam'], stat_2_fields)
 
-    return X, y
+    trainX = np.array(X)
+    trainY = np.array(y)
+
+    return trainX, trainY
 
 def get_data():
     year = int(tourneyYear)

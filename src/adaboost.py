@@ -1,3 +1,4 @@
+import data
 import csv				# used for reading in CSV
 import numpy as np		# used for array operations
 import math				# used for basic mathematical functions
@@ -27,7 +28,7 @@ def getBestStump(stumps, dataLabels, weights):
 
 	return bestD, bestT, bestStump, minError
 
-def adaBoost(M, D, T, N, trainingSet, thresholds):
+def adaBoost(M, D, T, N, trainingX, thresholds):
 	classifierAlphas = np.zeros(M)
 	classifierD = np.zeros(M)
 	classifierT = np.zeros(M)
@@ -40,15 +41,15 @@ def adaBoost(M, D, T, N, trainingSet, thresholds):
 			for t in range(0, T):	# T thresholds
 				predictions = np.zeros(N)
 				for n in range (0, N):	# N training samples
-					# print(trainingSet[n][d])
+					# print(trainingX[n][d])
 					# print(thresholds[d][t])
-					if (trainingSet[n][d] > thresholds[d][t]):
+					if (trainingX[n][d] > thresholds[d][t]):
 						predictions[n] = 1
 					else:
 						predictions[n] = 0
 				stumps[d][t] = predictions
 		# choose the best stump and calculate error and alpha
-		bestD, bestT, bestStump, error = getBestStump(stumps, trainingLabels, weights)
+		bestD, bestT, bestStump, error = getBestStump(stumps, trainingY, weights)
 		errorNorm = error / np.sum(weights)
 		alpha = math.log((1 - errorNorm) / errorNorm)
 
@@ -110,29 +111,43 @@ def getAccuracy(predictions, labels):
 	return accuracy
 
 if __name__ == '__main__':
-	# print decimals, not in scientific notation
-	np.set_printoptions(suppress=True)
 
-	dataSet=[]
-	dataLabels=[]
+	trainingX, trainingY, team_stats = data.get_data()
 
-	trainingSet = dataSet[0:int(len(dataSet)/2)]
-	trainingLabels = dataLabels[0:int(len(dataSet)/2)]
-	testSet = dataSet[int(len(dataSet)/2):len(dataSet)]
-	testLabels = dataLabels[int(len(dataSet)/2):len(dataSet)]
+	print("Generated training set!")
 
-	N = len(trainingSet)
+	tourney_teams, team_id_map = data.get_tourney_teams(2017)
+	tourney_teams.sort()
+
+	print("Got tourney teams!")
+
+	testingXtemp = []
+
+	matchups = []
+
+	for team1 in tourney_teams:
+	    for team2 in tourney_teams:
+	        if team1 < team2:
+	            game_features = data.get_game_features(team_1, team_2, 0, 2017, team_stats)
+	            testingXtemp.append(game_features)
+
+	            game = [team_1, team_2]
+	            matchups.append(game)
+
+	testingX = np.array(testingXtemp)
+	testingY = []
+
+	print("Generated testing set!")
+
+	N = len(trainingX)
 	weights = np.ones(N)/N
 
 	M = 30	# number of rounds
-	D = 8	# number of feature dimensions
+	D = len(trainingX[0]) # number of feature dimensions
 	T = 10	# number of thresholds per feature dimension
 
-	# ranges = np.ptp(trainingSet, axis=0)
-	# means = np.mean(trainingSet, axis=0)
-	# stdevs = np.std(trainingSet, axis=0)
-	mins = np.min(trainingSet, axis=0)
-	maxes = np.max(trainingSet, axis=0)
+	mins = np.min(trainingX, axis=0)
+	maxes = np.max(trainingX, axis=0)
 	thresholds = np.zeros((D, T))
 
 	# initialize 10 different threshold values for each dimension
@@ -140,25 +155,26 @@ if __name__ == '__main__':
 		thresholds[d] = np.linspace(mins[d], maxes[d], T, endpoint=False)
 
 	# call Adaptive Boost loop
-	classifierD, classifierT, classifierAlphas = adaBoost(M, D, T, N, trainingSet, thresholds)
+	classifierD, classifierT, classifierAlphas = adaBoost(M, D, T, N, trainingX, thresholds)
 
-	# print(classifierAlphas)
-	# print(classifierD)
-	# print(classifierT)
-	# print(thresholds)
+	print("Done fitting the model!")
 
 	# make predictions
-	trainingPredictions = predict(trainingSet, classifierD, classifierT, thresholds, classifierAlphas)
-	testPredictions = predict(testSet, classifierD, classifierT, thresholds, classifierAlphas)
-	# print(testPredictions)
+	testPredictions = predict(testingX, classifierD, classifierT, thresholds, classifierAlphas)
+
+	print("Finished making predictions!")
+
+	for i in range(0, len(matchups)):
+	    matchups[i].append(testPredictions[i])
+
+	results = np.array(matchups)
+	np.savetxt("AdaBoost_Predictions_2017.csv", results, delimiter=",", fmt='%s')
 
 	# Print the classifiers and weights used
 	print("Classifiers Used:")
 	for i in range(0, len(classifierAlphas)):
 		print("Feature Dimension: " + str(int(classifierD[i] + 1)) + ", Threshold: " + str(thresholds[int(classifierD[i])][int(classifierT[i])]) + ", Alpha: " + str(classifierAlphas[i]))
 
-	# Calculate and print accuracy
-	trainingAccuracy = getAccuracy(trainingPredictions, trainingLabels)
-	testAccuracy = getAccuracy(testPredictions, testLabels)
-	print("\nTraining Set Accuracy: " + str(trainingAccuracy))
-	print("Test Set Accuracy: " + str(testAccuracy))
+	# Calculate and print test accuracy
+	# testAccuracy = getAccuracy(testPredictions, testingY)
+	# print("Test Set Accuracy: " + str(testAccuracy))
