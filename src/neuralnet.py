@@ -3,18 +3,14 @@ import numpy as np
 from sklearn.neural_network import MLPClassifier
 from sklearn.metrics import accuracy_score
 
-if __name__ == "__main__":
+def train():
+    print "Building Data..."
     trainingX, trainingY, team_stats = data.get_data()
-
-    print("Generated training set!")
 
     tourney_teams, team_id_map = data.get_tourney_teams(2017)
     tourney_teams.sort()
 
-    print("Got tourney teams!")
-
     testingXtemp = []
-    testingYtemp = []
 
     matchups = []
 
@@ -28,24 +24,26 @@ if __name__ == "__main__":
                 matchups.append(game)
 
     testingX = np.array(testingXtemp)
-    # testingY = np.array(testingYtemp)
 
-    print("Generated testing set!")
+    print "Fitting model..."
+    model = MLPClassifier(solver='lbfgs', alpha=1e-5, hidden_layer_sizes=(5, 2), random_state=1)
+    model.fit(trainingX, trainingY)
 
-    neural_net = MLPClassifier(hidden_layer_sizes=(30,30))
-    neural_net.fit(trainingX, np.ravel(trainingY))
+    return model, testingX, matchups
 
-    print("Done fitting the model!")
+def predict(model, test_data, matchups):
+    print "Generating predictions..."
+    predictions = model.predict(test_data)
 
-    # make predictions
-    testPredictions = neural_net.predict(testingX)
-
-    print("Finished Neural Network predictions!")
-
+    # assuming that predictions is an array of the output labels
+    # name the output file something else
     for i in range(0, len(matchups)):
-        matchups[i].append(testPredictions[i])
+        matchups[i].append(predictions[i])
 
     results = np.array(matchups)
-    np.savetxt("NeuralNet_Predictions_2017.csv", results, delimiter=",", fmt='%s')
+    np.savetxt("neuralnet_predictions_2017.csv", results, delimiter=",", fmt='%s')
 
-    # print(accuracy_score(testingY, testPredictions))
+if __name__ == "__main__":
+    model, test_data, matchups = train()
+    predict(model, test_data, matchups)
+
