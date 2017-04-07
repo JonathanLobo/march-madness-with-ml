@@ -32,8 +32,11 @@ def train():
     model = MLPClassifier(solver='lbfgs', alpha=1e-5, hidden_layer_sizes=(5, 2), random_state=1)
     model.fit(trainingX, trainingY)
 
+    return model, testingX, matchups
+
+def predict(model, test_data, matchups):
     print "Generating predictions..."
-    predictions = model.predict(testingX)
+    predictions = model.predict(test_data)
 
     # assuming that predictions is an array of the output labels
     # name the output file something else
@@ -41,7 +44,8 @@ def train():
         matchups[i].append(predictions[i])
 
     results = np.array(matchups)
-    np.savetxt("regression_predictions_2017.csv", results, delimiter=",", fmt='%s')
+    np.savetxt("neuralnet_predictions_2017.csv", results, delimiter=",", fmt='%s')
 
 if __name__ == "__main__":
-    train()
+    model, test_data, matchups = train()
+    predict(model, test_data, matchups)
