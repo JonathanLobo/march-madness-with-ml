@@ -8,6 +8,7 @@
 #
 # print(accuracy_score(yTest, pred))
 
+import data
 import csv
 import math
 import operator

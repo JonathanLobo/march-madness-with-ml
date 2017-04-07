@@ -1,3 +1,4 @@
+import data
 import csv				# used for reading in CSV
 import numpy as np		# used for array operations
 import math				# used for basic mathematical functions
@@ -113,23 +114,23 @@ if __name__ == '__main__':
 
 	trainingX, trainingY, team_stats = data.get_data()
 
-    tourney_teams, team_id_map = data.get_tourney_teams(2017)
-    tourney_teams.sort()
+	tourney_teams, team_id_map = data.get_tourney_teams(2017)
+	tourney_teams.sort()
 
-    testingXtemp = []
+	testingXtemp = []
 
-    matchups = []
+	matchups = []
 
-    for team1 in tourney_teams:
-        for team2 in tourney_teams:
-            if team1 < team2:
-                game_features = data.get_game_features(team_1, team_2, 0, 2017, team_stats)
-                testingXtemp.append(game_features)
+	for team1 in tourney_teams:
+	    for team2 in tourney_teams:
+	        if team1 < team2:
+	            game_features = data.get_game_features(team_1, team_2, 0, 2017, team_stats)
+	            testingXtemp.append(game_features)
 
-                game = [team_1, team_2]
-                matchups.append(game)
+	            game = [team_1, team_2]
+	            matchups.append(game)
 
-    testingX = np.array(testingXtemp)
+	testingX = np.array(testingXtemp)
 	testingY = []
 
 	N = len(trainingX)
@@ -154,10 +155,10 @@ if __name__ == '__main__':
 	testPredictions = predict(testingX, classifierD, classifierT, thresholds, classifierAlphas)
 
 	for i in range(0, len(matchups)):
-        matchups[i].append(testPredictions[i])
+	    matchups[i].append(testPredictions[i])
 
-    results = np.array(matchups)
-    np.savetxt("AdaBoost_Predictions_2017.csv", results, delimiter=",", fmt='%s')
+	results = np.array(matchups)
+	np.savetxt("AdaBoost_Predictions_2017.csv", results, delimiter=",", fmt='%s')
 
 	# Print the classifiers and weights used
 	print("Classifiers Used:")
