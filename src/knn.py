@@ -98,8 +98,12 @@ if __name__ == "__main__":
 
 	trainingX, trainingY, team_stats = data.get_data()
 
+	print("Generated training set!")
+
 	tourney_teams, team_id_map = data.get_tourney_teams(2017)
 	tourney_teams.sort()
+
+	print("Got tourney teams!")
 
 	testingXtemp = []
 
@@ -115,6 +119,8 @@ if __name__ == "__main__":
 				matchups.append(game)
 
 	testingX = np.array(testingXtemp)
+
+	print("Generated testing set!")
 
 	# mode = 0 is KNN, mode = 1 is Gaussian Weighted Nearest Neighbors
 	mode = 0
@@ -136,6 +142,8 @@ if __name__ == "__main__":
 			neighbors = getNeighbors(trainingX, testingX[x], k, len(testingX[x]))
 			result = predictLabel(neighbors)
 		predictions.append(result)
+
+	print("Done making predictions!")
 
 	for i in range(0, len(matchups)):
 		matchups[i].append(predictions[i])

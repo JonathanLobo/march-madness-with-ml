@@ -114,8 +114,12 @@ if __name__ == '__main__':
 
 	trainingX, trainingY, team_stats = data.get_data()
 
+	print("Generated training set!")
+
 	tourney_teams, team_id_map = data.get_tourney_teams(2017)
 	tourney_teams.sort()
+
+	print("Got tourney teams!")
 
 	testingXtemp = []
 
@@ -132,6 +136,8 @@ if __name__ == '__main__':
 
 	testingX = np.array(testingXtemp)
 	testingY = []
+
+	print("Generated testing set!")
 
 	N = len(trainingX)
 	weights = np.ones(N)/N
@@ -151,8 +157,12 @@ if __name__ == '__main__':
 	# call Adaptive Boost loop
 	classifierD, classifierT, classifierAlphas = adaBoost(M, D, T, N, trainingX, thresholds)
 
+	print("Done fitting the model!")
+
 	# make predictions
 	testPredictions = predict(testingX, classifierD, classifierT, thresholds, classifierAlphas)
+
+	print("Finished making predictions!")
 
 	for i in range(0, len(matchups)):
 	    matchups[i].append(testPredictions[i])
