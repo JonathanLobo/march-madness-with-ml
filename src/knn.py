@@ -97,23 +97,23 @@ if __name__ == "__main__":
 
 	trainingX, trainingY, team_stats = data.get_data()
 
-	tourney_teams, team_id_map = data.get_tourney_teams(2017)
-	tourney_teams.sort()
+    tourney_teams, team_id_map = data.get_tourney_teams(2017)
+    tourney_teams.sort()
 
-	testingXtemp = []
+    testingXtemp = []
 
-	matchups = []
+    matchups = []
 
-	for team1 in tourney_teams:
-		for team2 in tourney_teams:
-			if team1 < team2:
-				game_features = data.get_game_features(team_1, team_2, 0, 2017, team_stats)
-				testingXtemp.append(game_features)
+    for team1 in tourney_teams:
+        for team2 in tourney_teams:
+            if team1 < team2:
+                game_features = data.get_game_features(team_1, team_2, 0, 2017, team_stats)
+                testingXtemp.append(game_features)
 
-				game = [team_1, team_2]
-				matchups.append(game)
+                game = [team_1, team_2]
+                matchups.append(game)
 
-	testingX = np.array(testingXtemp)
+    testingX = np.array(testingXtemp)
 
 	# mode = 0 is KNN, mode = 1 is Gaussian Weighted Nearest Neighbors
 	mode = 0
@@ -137,9 +137,9 @@ if __name__ == "__main__":
 		predictions.append(result)
 
 	for i in range(0, len(matchups)):
-		matchups[i].append(predictions[i])
+        matchups[i].append(predictions[i])
 
-	results = np.array(matchups)
-	np.savetxt("KNN_Predictions_2017.csv", results, delimiter=",", fmt='%s')
+    results = np.array(matchups)
+    np.savetxt("KNN_Predictions_2017.csv", results, delimiter=",", fmt='%s')
 
 	# accuracy = getAccuracy(testingX, predictions)
