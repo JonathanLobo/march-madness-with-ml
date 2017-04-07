@@ -11,7 +11,6 @@ if __name__ == "__main__":
     testingXtemp = []
 
     matchups = []
-    matchups.append(['Team1', 'Team2'])
 
     for team1 in tourney_teams:
         for team2 in tourney_teams:

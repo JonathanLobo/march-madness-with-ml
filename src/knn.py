@@ -13,17 +13,6 @@ import math
 import operator
 import itertools
 
-def readDataset(filename, dataSet=[] , dataLabels=[]):
-	with open(filename, 'r') as csvfile:
-		lines = csv.reader(csvfile)
-		dataset = list(lines)
-		for x in range(760):
-			tempList=[]
-			for y in range(8):
-				tempList.append(float(dataset[x][y]))
-			dataSet.append(tempList)
-			dataLabels.append(str(dataset[x][8]))
-
 def getDistance(item1, item2, length):
 	distance = 0
 	for x in range(length):
@@ -36,21 +25,21 @@ def getWeight(item1, item2, bandwidth, length):
 	weight = math.exp(num/den)
 	return weight
 
-def getNeighbors(trainingSet, testItem, k, length):
+def getNeighbors(trainingX, testItem, k, length):
 	distances = []
-	for x in range(len(trainingSet)):
-		dist = getDistance(testItem, trainingSet[x], length)
-		distances.append((trainingSet[x], dist))
+	for x in range(len(trainingX)):
+		dist = getDistance(testItem, trainingX[x], length)
+		distances.append((trainingX[x], dist))
 	distances.sort(key=operator.itemgetter(1))
 	neighbors = []
 	for x in range(k):
 		neighbors.append(distances[x][0])
 	return neighbors
 
-def getNeighborsGaussian(trainingSet, testItem, bandwidth, length):
+def getNeighborsGaussian(trainingX, testItem, bandwidth, length):
 	weights = []
-	for x in range(len(trainingSet)):
-		weight = getWeight(testItem, trainingSet[x], bandwidth, length)
+	for x in range(len(trainingX)):
+		weight = getWeight(testItem, trainingX[x], bandwidth, length)
 		weights.append(weight)
 	return weights
 
@@ -65,10 +54,10 @@ def predictLabel(neighbors):
 	sortedVotes = sorted(classVotes.items(), key=operator.itemgetter(1), reverse=True)
 	return sortedVotes[0][0]
 
-def predictLabelGaussian(weights, trainingSet):
+def predictLabelGaussian(weights, trainingX):
 	classVotes = {}
 	for x in range(len(weights)):
-		label = trainingSet[x][-1]
+		label = trainingX[x][-1]
 		if label in classVotes:
 			classVotes[label] += weights[x]
 		else:
@@ -76,135 +65,81 @@ def predictLabelGaussian(weights, trainingSet):
 	sortedVotes = sorted(classVotes.items(), key=operator.itemgetter(1), reverse=True)
 	return sortedVotes[0][0]
 
-def getAccuracy(testSet, predictions):
+def getAccuracy(testingX, predictions):
 	correct = 0
-	for x in range(len(testSet)):
-		if testSet[x][-1] == predictions[x]:
+	for x in range(len(testingX)):
+		if testingX[x][-1] == predictions[x]:
 			correct += 1
-	return (correct/float(len(testSet))) * 100.0
+	return (correct/float(len(testingX))) * 100.0
 
-def normalize(trainingSet, testSet):
-	for i in range(len(trainingSet[0]) - 1):
+def normalize(trainingX, testingX):
+	for i in range(len(trainingX[0]) - 1):
 		summation = 0
-		for j in range(len(trainingSet)):
-			summation = summation + float(trainingSet[j][i])
-		mean = summation/len(trainingSet)
+		for j in range(len(trainingX)):
+			summation = summation + float(trainingX[j][i])
+		mean = summation/len(trainingX)
 
 		sumSquares = 0
-		for k in range(len(trainingSet)):
-			sumSquares = sumSquares + pow(float(trainingSet[k][i]) - mean, 2)
-		meanSumSquares = sumSquares/len(trainingSet)
+		for k in range(len(trainingX)):
+			sumSquares = sumSquares + pow(float(trainingX[k][i]) - mean, 2)
+		meanSumSquares = sumSquares/len(trainingX)
 		stDev = math.sqrt(meanSumSquares)
 
-		for m in range(len(trainingSet)):
-			trainingSet[m][i] = (float(trainingSet[m][i]) - mean)/stDev
+		for m in range(len(trainingX)):
+			trainingX[m][i] = (float(trainingX[m][i]) - mean)/stDev
 
-		for n in range(len(testSet)):
-			testSet[n][i] = (float(testSet[n][i]) - mean)/stDev
+		for n in range(len(testingX)):
+			testingX[n][i] = (float(testingX[n][i]) - mean)/stDev
 
-	return trainingSet, testSet
+	return trainingX, testingX
 
-def runKnn(k, x_train, y_train, x_test):
-	for i in range(len(y_train)):
-		x_train[i].append(dataLabels[i])
+if __name__ == "__main__":
 
-	y_test=[]
+	trainingX, trainingY, team_stats = data.get_data()
 
-	for x in range(len(x_test)):
-		neighbors = getNeighbors(x_train, x_test[x], k, len(testSet[x])-1)
-		result = predictLabel(neighbors)
-		y_test.append(result)
-		print('predicted=' + str(result))
+    tourney_teams, team_id_map = data.get_tourney_teams(2017)
+    tourney_teams.sort()
 
-	return y_test
+    testingXtemp = []
 
-def runKnnGaussian(bandwidth, x_train, y_train, x_test):
-	for i in range(len(y_train)):
-		x_train[i].append(dataLabels[i])
+    matchups = []
 
-	y_test=[]
+    for team1 in tourney_teams:
+        for team2 in tourney_teams:
+            if team1 < team2:
+                game_features = data.get_game_features(team_1, team_2, 0, 2017, team_stats)
+                testingXtemp.append(game_features)
 
-	for x in range(len(x_test)):
-		neighbors = getNeighborsGaussian(x_train, x_test[x], bandwidth, len(testSet[x])-1)
-		result = predictLabelGaussian(neighbors, trainingSet)
-		y_test.append(result)
-		print('predicted=' + str(result))
+                game = [team_1, team_2]
+                matchups.append(game)
 
-	return y_test
+    testingX = np.array(testingXtemp)
 
-# mode = 0 is KNN, mode = 1 is Gaussian weighted nearest neighbors
-def testKnn(k, dataSet, dataLabels, mode):
+	# mode = 0 is KNN, mode = 1 is Gaussian Weighted Nearest Neighbors
+	mode = 0
+	k = 10
 
-	for i in range(len(dataLabels)):
-		dataSet[i].append(dataLabels[i])
+	for i in range(len(trainingY)):
+		trainingX[i].append(trainingY[i])
 
-	index = 76
-	fold1 = dataSet[0:index]
-	fold2 = dataSet[index:index+76]
-	index = index + 76
-	fold3 = dataSet[index:index+76]
-	index = index + 76
-	fold4 = dataSet[index:index+76]
-	index = index + 76
-	fold5 = dataSet[index:index+76]
-	index = index + 76
-	fold6 = dataSet[index:index+76]
-	index = index + 76
-	fold7 = dataSet[index:index+76]
-	index = index + 76
-	fold8 = dataSet[index:index+76]
-	index = index + 76
-	fold9 = dataSet[index:index+76]
-	index = index + 76
-	fold10 = dataSet[index:index+76]
+	trainingX, testingX = normalize(trainingSet, testSet)
+	trainingY = []
 
-	listOfFolds=[]
-	listOfFolds.append(fold1)
-	listOfFolds.append(fold2)
-	listOfFolds.append(fold3)
-	listOfFolds.append(fold4)
-	listOfFolds.append(fold5)
-	listOfFolds.append(fold6)
-	listOfFolds.append(fold7)
-	listOfFolds.append(fold8)
-	listOfFolds.append(fold9)
-	listOfFolds.append(fold10)
+	predictions=[]
 
-	sumAcc = 0
+	for x in range(len(testingX)):
+		if mode == 1:
+			neighbors = getNeighborsGaussian(trainingX, testingX[x], k, len(testingX[x]))
+			result = predictLabelGaussian(neighbors, trainingX)
+		else:
+			neighbors = getNeighbors(trainingX, testingX[x], k, len(testingX[x]))
+			result = predictLabel(neighbors)
+		predictions.append(result)
 
-	for i in range(10):
-		trainingSet=[]
-		testSet=[]
-		for j in range(10):
-			if(j == i):
-				testSet = listOfFolds[j]
-			else:
-				trainingSet = trainingSet + listOfFolds[j]
+	for i in range(0, len(matchups)):
+        matchups[i].append(predictions[i])
 
-		predictions=[]
+    results = np.array(matchups)
+    np.savetxt("KNN_Predictions_2017.csv", results, delimiter=",", fmt='%s')
 
-		trainingSet, testSet = normalize(trainingSet, testSet)
-
-		for x in range(len(testSet)):
-			if mode == 1:
-				neighbors = getNeighborsGaussian(trainingSet, testSet[x], k, len(testSet[x])-1)
-				result = predictLabelGaussian(neighbors, trainingSet)
-			else:
-				neighbors = getNeighbors(trainingSet, testSet[x], k, len(testSet[x])-1)
-				result = predictLabel(neighbors)
-			predictions.append(result)
-			# print('predicted=' + str(result) + ', actual=' + str(testSet[x][-1]))
-
-		accuracy = getAccuracy(testSet, predictions)
-		sumAcc = sumAcc + accuracy
-		print('Run ' + str(i+1) + ' Accuracy: ' + str(round(accuracy, 2)) + '%')
-
-	print('Average Accuracy: ' + str(round(sumAcc/10, 2)) + '%')
-	return predictions
-
-dataSet=[]
-dataLabels=[]
-
-readDataset('pima-indians-diabetes.data', dataSet, dataLabels)
-
-testKnn(1, dataSet, dataLabels, 1)
+	# accuracy = getAccuracy(testingX, predictions)
