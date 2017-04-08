@@ -1,35 +1,30 @@
-import data
-import numpy as np
+import pandas as pd
+
+def compute_accuracies():
+    test_Y = pd.read_csv("../data2017/TourneyMatchups2017.csv", header=0)
+
+    adaboost_data = pd.read_csv("../predictions/AdaBoost_Predictions_2017.csv", header=0)
+    knn_data = pd.read_csv("../predictions/KNN_Predictions_2017.csv", header=0)
+    naive_bayes_data = pd.read_csv("../predictions/NaiveBayes_Predictions_2017.csv", header=0)
+    neural_net_data = pd.read_csv("../predictions/NeuralNet_Predictions_2017.csv", header=0)
+    random_forest_data = pd.read_csv("../predictions/RandomForest_Predictions_2017.csv", header=0)
+    regression_data = pd.read_csv("../predictions/Regression_Predictions_2017.csv", header=0)
+    svm_data = pd.read_csv("../predictions/SVM_Predictions_2017.csv", header=0)
+
+    test_list = [adaboost_data, knn_data, naive_bayes_data, neural_net_data, random_forest_data, regression_data, svm_data]
+
+    count = 0
+    for df in test_list:
+        for index, row in df.iterrows():
+            for index, test_row in test_Y.iterrows():
+                if row['Team1'] == test_row['Team1'] and row['Team2'] == test_row['Team2']:  # make sure teams match
+                    if row['Prediction'] == test_row['Prediction']:
+                        # print "Team 1: ", row['Team1']
+                        # print "Team 2: ", row['Team2']
+                        # print "Winner: ", row['Prediction']
+                        count = count + 1
+        print "Accuracy: ", count / 63.0 * 100
+        count = 0
 
 if __name__ == "__main__":
-
-    trainingX, trainingY, team_stats = data.get_data()
-
-    tourney_teams, team_id_map = data.get_tourney_teams(2017)
-    tourney_teams.sort()
-
-    testingXtemp = []
-
-    matchups = []
-
-    for team1 in tourney_teams:
-        for team2 in tourney_teams:
-            if team1 < team2:
-                game_features = data.get_game_features(team_1, team_2, 0, 2017, team_stats)
-                testingXtemp.append(game_features)
-
-                game = [team_1, team_2]
-                matchups.append(game)
-
-    testingX = np.array(testingXtemp)
-
-    # here is where you train the model using trainingX and trainingY
-    # then make output label predictions based on testingX
-
-    # assuming that predictions is an array of the output labels
-    # name the output file something else
-    for i in range(0, len(matchups)):
-        matchups[i].append(predictions[i])
-
-    results = np.array(matchups)
-    np.savetxt("ModelName.csv", results, delimiter=",", fmt='%s')
+    compute_accuracies()
