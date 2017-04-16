@@ -32,8 +32,7 @@ if __name__ == "__main__":
 
 	print("Generated testing set!")
 
-	dt = DecisionTreeClassifier()
-	model_adaboost = AdaBoostClassifier(n_estimators=100, base_estimator=dt,learning_rate=1)
+	model_adaboost = AdaBoostClassifier(n_estimators=100, base_estimator=DecisionTreeClassifier(max_depth=1), learning_rate=0.1)
 	model_adaboost.fit(trainingX, np.ravel(trainingY))
 
 	print("Done fitting the model!")
