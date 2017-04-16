@@ -33,6 +33,7 @@ if __name__ == "__main__":
     print("Generated testing set!")
 
     #initialize all kernels
+    # model_rbf = svm.SVC(kernel='rbf', probability=True)
     model_rbf = svm.SVC(kernel='rbf', probability=True)
     # model_linear = svm.SVC(kernel='linear', probability=True)
     # model_poly = svm.SVC(kernel='poly', probability=True)
@@ -47,7 +48,8 @@ if __name__ == "__main__":
     print("Done fitting SVM!")
 
     # predict on testing set
-    predict_rbf = model_rbf.predict(testingX)
+    # predict_rbf = model_rbf.predict(testingX)
+    predict_rbf = model_rbf.predict_proba(testingX)
     # predict_linear = model_linear.predict(testingX)
     # predict_poly = model_poly.predict(testingX)
     # predict_sigmoid = model_sigmoid.predict(testingX)
@@ -55,10 +57,11 @@ if __name__ == "__main__":
     print("Finished SVM predictions!")
 
     for i in range(0, len(matchups)):
-        matchups[i].append(predict_rbf[i])
+        # matchups[i].append(predict_rbf[i])
+        matchups[i].append(predict_rbf[i][0])
 
     results = np.array(matchups)
-    np.savetxt("SVM_Predictions_2017.csv", results, delimiter=",", fmt='%s')
+    np.savetxt("SVM_Probs_2017.csv", results, delimiter=",", fmt='%s')
 
     # print(str(accuracy_score(testingY, predict_rbf)))
     # print(str(accuracy_score(testingY, predict_linear)))

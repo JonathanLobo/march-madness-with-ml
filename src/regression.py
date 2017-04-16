@@ -32,15 +32,17 @@ def train():
 
 def predict(model, test_data, matchups):
     print ("Generating predictions...")
-    predictions = model.predict(test_data)
+    # predictions = model.predict(test_data)
+    predictions = model.predict_proba(test_data)
 
     # assuming that predictions is an array of the output labels
     # name the output file something else
     for i in range(0, len(matchups)):
-        matchups[i].append(predictions[i])
+        # matchups[i].append(predictions[i])
+        matchups[i].append(predictions[i][0])
 
     results = np.array(matchups)
-    np.savetxt("Regression_Predictions_2017.csv", results, delimiter=",", fmt='%s')
+    np.savetxt("Regression_Probs_2017.csv", results, delimiter=",", fmt='%s')
 
 if __name__ == "__main__":
     model, test_data, matchups = train()

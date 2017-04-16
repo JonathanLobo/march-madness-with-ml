@@ -39,14 +39,16 @@ if __name__ == "__main__":
 	print("Done fitting the model!")
 
 	# make predictions
-	testPredictions = knn.predict(testingX)
+	# testPredictions = knn.predict(testingX)
+	testPredictions = knn.predict_proba(testingX)
 
 	print("Finished K-Nearest Neighbors predictions!")
 
 	for i in range(0, len(matchups)):
-	    matchups[i].append(testPredictions[i])
+	    # matchups[i].append(testPredictions[i])
+		matchups[i].append(testPredictions[i][0])
 
 	results = np.array(matchups)
-	np.savetxt("KNN_Predictions_2017.csv", results, delimiter=",", fmt='%s')
+	np.savetxt("KNN_Probs_2017.csv", results, delimiter=",", fmt='%s')
 
 	# print(accuracy_score(testingY, testPredictions))

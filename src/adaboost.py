@@ -39,12 +39,14 @@ if __name__ == "__main__":
 	print("Done fitting the model!")
 
 	# make predictions
-	testPredictions = model_adaboost.predict(testingX)
+	# testPredictions = model_adaboost.predict(testingX)
+	testPredictions = model_adaboost.predict_proba(testingX)
 
 	print("Finished AdaBoost predictions!")
 
 	for i in range(0, len(matchups)):
-	    matchups[i].append(testPredictions[i])
+	    # matchups[i].append(testPredictions[i])
+		matchups[i].append(testPredictions[i][0])
 
 	results = np.array(matchups)
-	np.savetxt("AdaBoost_Predictions_2017.csv", results, delimiter=",", fmt='%s')
+	np.savetxt("AdaBoost_Probs_2017.csv", results, delimiter=",", fmt='%s')
