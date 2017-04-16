@@ -6,8 +6,6 @@ def train():
     print ("Building Data...")
     trainingX, trainingY, team_stats = data.get_data()
 
-    exit()
-
     tourney_teams, team_id_map = data.get_tourney_teams(2017)
     tourney_teams.sort()
 
