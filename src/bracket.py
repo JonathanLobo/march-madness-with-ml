@@ -28,7 +28,7 @@ def build_bracket():
         round_val = 10
         for i in range(6):  # 6 rounds of tourney
             print
-            print "ROUND ", i+1
+            print ("ROUND " + str(i+1))
             while my_index < len(teams):
                 #print my_index
                 team1 = teams[my_index]
@@ -40,20 +40,20 @@ def build_bracket():
                     if (row["Team1"] == team1 and row["Team2"] == team2) or (row["Team1"] == team2 and row["Team2"] == team1):
                         if row["Prediction"] == 0:
                             tempTeams.append(row["Team1"])
-                            print team_id_map[row["Team1"]], " over ", team_id_map[row["Team2"]]
-                            print "Round Val: ", round_val
+                            print (str(team_id_map[row["Team1"]]) + " over " + str(team_id_map[row["Team2"]]))
+                            print ("Round Val: " + str(round_val))
                             winner = 0
                         else:
                             tempTeams.append(row["Team2"])
-                            print team_id_map[row["Team2"]], " over ", team_id_map[row["Team1"]]
-                            print "Round Val: ", round_val
+                            print (str(team_id_map[row["Team2"]]) + " over " + str(team_id_map[row["Team1"]]))
+                            print ("Round Val: " + str(round_val))
                             winner = 1
 
                         for index, new_row in results_df.iterrows():
                             if (new_row["Team1"] == team1 and new_row["Team2"] == team2) or (new_row["Team1"] == team2 and new_row["Team2"] == team1):
                                 if winner == new_row["Prediction"]:
                                     score = score + round_val
-                                    print "Score: ", score
+                                    print ("Score: " + str(score))
 
                         my_index = my_index + 2
 
@@ -61,7 +61,7 @@ def build_bracket():
             teams = tempTeams
             tempTeams = []
             my_index = 0
-        print "Score: ", score
+        print ("Score: " + str(score))
 
 if __name__ == "__main__":
     build_bracket()

@@ -4,7 +4,7 @@ from sklearn.neural_network import MLPClassifier
 from sklearn.metrics import accuracy_score
 
 def train():
-    print "Building Data..."
+    print ("Building Data...")
     trainingX, trainingY, team_stats = data.get_data()
 
     tourney_teams, team_id_map = data.get_tourney_teams(2017)
@@ -25,14 +25,14 @@ def train():
 
     testingX = np.array(testingXtemp)
 
-    print "Fitting model..."
+    print ("Fitting model...")
     model = MLPClassifier(hidden_layer_sizes=(30, 30))
     model.fit(trainingX, np.ravel(trainingY))
 
     return model, testingX, matchups
 
 def predict(model, test_data, matchups):
-    print "Generating predictions..."
+    print ("Generating predictions...")
     predictions = model.predict(test_data)
 
     # assuming that predictions is an array of the output labels

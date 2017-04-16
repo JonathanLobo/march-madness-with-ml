@@ -23,7 +23,7 @@ def compute_accuracies():
                         # print "Team 2: ", row['Team2']
                         # print "Winner: ", row['Prediction']
                         count = count + 1
-        print "Accuracy: ", count / 63.0 * 100
+        print ("Accuracy: " + str(count / 63.0 * 100))
         count = 0
 
 if __name__ == "__main__":

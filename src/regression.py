@@ -3,8 +3,10 @@ import numpy as np
 from sklearn import linear_model
 
 def train():
-    print "Building Data..."
+    print ("Building Data...")
     trainingX, trainingY, team_stats = data.get_data()
+
+    exit()
 
     tourney_teams, team_id_map = data.get_tourney_teams(2017)
     tourney_teams.sort()
@@ -24,14 +26,14 @@ def train():
 
     testingX = np.array(testingXtemp)
 
-    print "Fitting model..."
+    print ("Fitting model...")
     model = linear_model.LogisticRegression(C=1e5)
     model.fit(trainingX, np.ravel(trainingY))
 
     return model, testingX, matchups
 
 def predict(model, test_data, matchups):
-    print "Generating predictions..."
+    print ("Generating predictions...")
     predictions = model.predict(test_data)
 
     # assuming that predictions is an array of the output labels
