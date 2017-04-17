@@ -14,16 +14,6 @@ def format_as_df(csv_file):
     df = pd.read_csv(csv_file)
     return df
 
-def get_dataframes():
-    season_compact_results = d.format_as_df('../data' + tourneyYear + '/RegularSeasonCompactResults.csv')
-    season_detailed_results = d.format_as_df('../data' + tourneyYear + '/RegularSeasonDetailedResults.csv')
-    teams = d.format_as_df('../data' + tourneyYear + '/Teams.csv')
-    seasons = d.format_as_df('../data' + tourneyYear + '/Seasons.csv')
-    tourney_compact_results = d.format_as_df('../data' + tourneyYear + '/TourneyCompactResults.csv')
-    tourney_detailed_results = d.format_as_df('../data' + tourneyYear + '/TourneyDetailedResults.csv')
-    seeds = d.format_as_df('../data' + tourneyYear + '/TourneySeeds.csv')
-    slots = d.format_as_df('../data' + tourneyYear + '/TourneySlots.csv')
-
 # get temporary team stats for a current point in the season while generating test cases
 def get_stat_temp(season, team, field):
     try:

@@ -39,7 +39,7 @@ def compute_log_loss():
     regression_data = pd.read_csv("../predictions/Regression_Probs_2017.csv", header=0)
     svm_data = pd.read_csv("../predictions/SVM_Probs_2017.csv", header=0)
 
-    test_list = [adaboost_data, knn_data, naive_bayes_data, neural_net_data, random_forest_data, regression_data]
+    test_list = [adaboost_data, knn_data, naive_bayes_data, neural_net_data, random_forest_data, regression_data, svm_data]
 
     for df in test_list:
         y_true_list = []
